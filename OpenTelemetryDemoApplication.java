@@ -40,10 +40,14 @@ public class OpenTelemetryDemoApplication {
 
         @GetMapping("/hello")
         public String hello() {
-            Span span = tracer.spanBuilder("hello-span").startSpan();
+            Span span = tracer.spanBuilder("hello-span")
+                    .setNoParent()  // No parent span is inherited
+                    .startSpan();
             try (Scope scope = span.makeCurrent()) {
+                String spanId = span.getSpanContext().getSpanId();
+                System.out.println("New Span Created with Span ID: " + spanId);  // Print the span ID for each request
                 Thread.sleep(1000);
-                return "Hello, OpenTelemetry!";
+                return "Hello, OpenTelemetry! Span ID: " + spanId;
             } catch (InterruptedException e) {
                 return "Error in processing";
             } finally {
